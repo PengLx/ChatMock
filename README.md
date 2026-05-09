@@ -67,7 +67,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="gpt-5.4",
+    model="gpt-5.5",
     messages=[{"role": "user", "content": "hello"}]
 )
 print(response.choices[0].message.content)
@@ -82,7 +82,7 @@ print(response.choices[0].message.content)
 curl http://127.0.0.1:8000/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gpt-5.4",
+    "model": "gpt-5.5",
     "messages": [{"role": "user", "content": "hello"}]
   }'
 ```
@@ -93,6 +93,7 @@ curl http://127.0.0.1:8000/v1/chat/completions \
 
 ## Supported Models
 
+- `gpt-5.5`
 - `gpt-5.4`
 - `gpt-5.4-mini`
 - `gpt-5.2`
@@ -141,7 +142,7 @@ All flags go after `chatmock serve`. These can also be set as environment variab
 
 ```json
 {
-  "model": "gpt-5.4",
+  "model": "gpt-5.5",
   "messages": [{"role": "user", "content": "latest news on ..."}],
   "responses_tools": [{"type": "web_search"}],
   "responses_tool_choice": "auto"
@@ -155,7 +156,7 @@ All flags go after `chatmock serve`. These can also be set as environment variab
 
 ```json
 {
-  "model": "gpt-5.4",
+  "model": "gpt-5.5",
   "input": "summarize this",
   "fast_mode": true
 }

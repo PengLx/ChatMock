@@ -327,7 +327,7 @@ class MainWindow(QtWidgets.QMainWindow):
         form.addWidget(QtWidgets.QLabel("Debug Model"), 1, 0)
         self.debug_model_edit = QtWidgets.QLineEdit("")
         self.debug_model_edit.setClearButtonEnabled(True)
-        self.debug_model_edit.setPlaceholderText("Optional override, e.g. gpt-5.4")
+        self.debug_model_edit.setPlaceholderText("Optional override, e.g. gpt-5.5")
         self.debug_model_edit.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Fixed)
         form.addWidget(self.debug_model_edit, 1, 1, 1, 3)
         form.setColumnStretch(1, 1)

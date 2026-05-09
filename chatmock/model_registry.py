@@ -20,6 +20,13 @@ class ModelSpec:
 
 _MODEL_SPECS = (
     ModelSpec(
+        public_id="gpt-5.5",
+        upstream_id="gpt-5.5",
+        aliases=("gpt5.5", "gpt-5.5-latest"),
+        allowed_efforts=frozenset(("none", "low", "medium", "high", "xhigh")),
+        variant_efforts=("xhigh", "high", "medium", "low", "none"),
+    ),
+    ModelSpec(
         public_id="gpt-5",
         upstream_id="gpt-5",
         aliases=("gpt5", "gpt-5-latest"),
@@ -161,7 +168,7 @@ def normalize_model_name(model: str | None, debug_model: str | None = None) -> s
     if spec is not None:
         return spec.upstream_id
     base, _ = _strip_model_name(model)
-    return base or "gpt-5.4"
+    return base or "gpt-5.5"
 
 
 def uses_codex_instructions(model: str | None) -> bool:

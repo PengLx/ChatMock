@@ -59,6 +59,7 @@ class RouteTests(unittest.TestCase):
         body = response.get_json()
         self.assertEqual(response.status_code, 200)
         model_ids = [item["id"] for item in body["data"]]
+        self.assertIn("gpt-5.5", model_ids)
         self.assertIn("gpt-5.4", model_ids)
         self.assertIn("gpt-5.4-mini", model_ids)
         self.assertIn("gpt-5.3-codex-spark", model_ids)
@@ -68,6 +69,7 @@ class RouteTests(unittest.TestCase):
         body = response.get_json()
         self.assertEqual(response.status_code, 200)
         model_names = [item["name"] for item in body["models"]]
+        self.assertIn("gpt-5.5", model_names)
         self.assertIn("gpt-5.4", model_names)
         self.assertIn("gpt-5.4-mini", model_names)
 
