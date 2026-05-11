@@ -23,6 +23,7 @@ from .session import (
 )
 from .upstream import build_upstream_headers, build_upstream_websocket_url
 from .utils import get_effective_chatgpt_auth
+from .http import is_authorized_bearer
 
 
 def _log_json(prefix: str, payload: Any) -> None:
@@ -85,6 +86,13 @@ def register_websocket_routes(sock: Sock) -> None:
                 pass
 
         try:
+            if not is_authorized_bearer(
+                request.headers.get("Authorization"),
+                current_app.config.get("API_KEY"),
+            ):
+                _send_error("Invalid or missing bearer token.", status_code=401)
+                return
+
             while True:
                 incoming = ws.receive()
                 if incoming is None:

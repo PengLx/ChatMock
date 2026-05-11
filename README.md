@@ -63,7 +63,7 @@ from openai import OpenAI
 
 client = OpenAI(
     base_url="http://127.0.0.1:8000/v1",
-    api_key="anything"  # not checked
+    api_key="anything"  # checked only when CHATMOCK_API_KEY is set
 )
 
 response = client.chat.completions.create(
@@ -134,6 +134,7 @@ All flags go after `chatmock serve`. These can also be set as environment variab
 | `--reasoning-summary` | `CHATGPT_LOCAL_REASONING_SUMMARY` | auto, concise, detailed, none | auto | Thinking summary verbosity |
 | `--reasoning-compat` | `CHATGPT_LOCAL_REASONING_COMPAT` | legacy, o3, think-tags | think-tags | How reasoning is returned to the client |
 | `--fast-mode` | `CHATGPT_LOCAL_FAST_MODE` | true/false | false | Priority processing for supported models |
+| `--api-key` | `CHATMOCK_API_KEY` | bearer token string | unset | Require incoming `Authorization: Bearer ...` |
 | `--enable-web-search` | `CHATGPT_LOCAL_ENABLE_WEB_SEARCH` | true/false | false | Allow the model to search the web |
 | `--expose-reasoning-models` | `CHATGPT_LOCAL_EXPOSE_REASONING_MODELS` | true/false | false | List each reasoning level as its own model |
 

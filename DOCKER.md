@@ -27,6 +27,7 @@ Set options in `.env` or pass environment variables:
 - `CHATGPT_LOCAL_HOME`: Container auth directory (default `/data`)
 - `CHATMOCK_AUTH_SOURCE`: Named volume or host directory mounted at `/data` (default `chatmock_data`)
 - `CHATMOCK_PROMPT_FILE`: Host prompt file mounted into the container (default `./prompt.md`)
+- `CHATMOCK_API_KEY`: Optional inbound API token; when set, clients must send `Authorization: Bearer <token>`
 - `VERBOSE`: `true|false` to enable request/stream logs
 - `VERBOSE_OBFUSCATION`: `true|false` to include raw SSE/obfuscation logs
 - `CHATGPT_LOCAL_REASONING_EFFORT`: none|minimal|low|medium|high|xhigh
@@ -64,5 +65,6 @@ Set `VERBOSE=true` to include extra logging for troubleshooting upstream or chat
 ```
 curl -s http://localhost:8000/v1/chat/completions \
    -H 'Content-Type: application/json' \
+   -H 'Authorization: Bearer your-token-if-CHATMOCK_API_KEY-is-set' \
    -d '{"model":"gpt-5.5","messages":[{"role":"user","content":"Hello world!"}]}' | jq .
 ```

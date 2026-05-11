@@ -9,6 +9,7 @@ from unittest.mock import patch
 
 from chatmock.app import create_app
 from chatmock.session import reset_session_state
+from websockets.exceptions import InvalidStatus
 from websockets.sync.client import connect as ws_connect
 
 
@@ -72,6 +73,27 @@ class RouteTests(unittest.TestCase):
         self.assertIn("gpt-5.5", model_names)
         self.assertIn("gpt-5.4", model_names)
         self.assertIn("gpt-5.4-mini", model_names)
+
+    def test_bearer_auth_is_optional_by_default(self) -> None:
+        response = self.client.get("/v1/models")
+        self.assertEqual(response.status_code, 200)
+
+    def test_bearer_auth_protects_api_routes_when_configured(self) -> None:
+        app = create_app(api_key="secret-token")
+        client = app.test_client()
+
+        health = client.get("/health")
+        self.assertEqual(health.status_code, 200)
+
+        missing = client.get("/v1/models")
+        self.assertEqual(missing.status_code, 401)
+        self.assertEqual(missing.headers.get("WWW-Authenticate"), 'Bearer realm="chatmock"')
+
+        wrong = client.get("/v1/models", headers={"Authorization": "Bearer wrong"})
+        self.assertEqual(wrong.status_code, 401)
+
+        ok = client.get("/v1/models", headers={"Authorization": "Bearer secret-token"})
+        self.assertEqual(ok.status_code, 200)
 
     @patch("chatmock.routes_openai.start_upstream_request")
     def test_chat_completions(self, mock_start) -> None:
@@ -654,6 +676,31 @@ class RouteTests(unittest.TestCase):
             follow_up["input"],
             [{"type": "message", "role": "user", "content": [{"type": "input_text", "text": "second"}]}],
         )
+
+    def test_responses_websocket_requires_bearer_when_configured(self) -> None:
+        app = create_app(api_key="secret-token")
+
+        sock = socket.socket()
+        sock.bind(("127.0.0.1", 0))
+        host, port = sock.getsockname()
+        sock.close()
+
+        server_thread = threading.Thread(
+            target=app.run,
+            kwargs={
+                "host": host,
+                "port": port,
+                "use_reloader": False,
+                "threaded": True,
+            },
+            daemon=True,
+        )
+        server_thread.start()
+        time.sleep(0.5)
+
+        with self.assertRaises(InvalidStatus):
+            with ws_connect(f"ws://{host}:{port}/v1/responses"):
+                pass
 
 
 if __name__ == "__main__":

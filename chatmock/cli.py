@@ -271,6 +271,7 @@ def cmd_serve(
     debug_model: str | None,
     expose_reasoning_models: bool,
     default_web_search: bool,
+    api_key: str | None,
 ) -> int:
     app = create_app(
         verbose=verbose,
@@ -282,6 +283,7 @@ def cmd_serve(
         debug_model=debug_model,
         expose_reasoning_models=expose_reasoning_models,
         default_web_search=default_web_search,
+        api_key=api_key,
     )
 
     app.run(host=host, use_reloader=False, port=port, threaded=True)
@@ -310,6 +312,12 @@ def main() -> None:
         dest="debug_model",
         default=os.getenv("CHATGPT_LOCAL_DEBUG_MODEL"),
         help="Forcibly override requested 'model' with this value",
+    )
+    p_serve.add_argument(
+        "--api-key",
+        dest="api_key",
+        default=os.getenv("CHATMOCK_API_KEY"),
+        help="Require incoming requests to use Authorization: Bearer with this token.",
     )
     p_serve.add_argument(
         "--fast-mode",
@@ -378,6 +386,7 @@ def main() -> None:
                 debug_model=args.debug_model,
                 expose_reasoning_models=args.expose_reasoning_models,
                 default_web_search=args.enable_web_search,
+                api_key=args.api_key,
             )
         )
     elif args.command == "info":

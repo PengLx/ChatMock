@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from flask import Flask, jsonify
+import os
+
+from flask import Flask, jsonify, request
 from flask_sock import Sock
 
 from .config import BASE_INSTRUCTIONS, GPT5_CODEX_INSTRUCTIONS
-from .http import build_cors_headers
+from .http import build_cors_headers, is_authorized_bearer, unauthorized_bearer_response
 from .routes_openai import openai_bp
 from .routes_ollama import ollama_bp
 from .websocket_routes import register_websocket_routes
@@ -20,6 +22,7 @@ def create_app(
     debug_model: str | None = None,
     expose_reasoning_models: bool = False,
     default_web_search: bool = False,
+    api_key: str | None = None,
 ) -> Flask:
     app = Flask(__name__)
 
@@ -35,12 +38,24 @@ def create_app(
         GPT5_CODEX_INSTRUCTIONS=GPT5_CODEX_INSTRUCTIONS,
         EXPOSE_REASONING_MODELS=bool(expose_reasoning_models),
         DEFAULT_WEB_SEARCH=bool(default_web_search),
+        API_KEY=api_key if isinstance(api_key, str) and api_key.strip() else os.getenv("CHATMOCK_API_KEY"),
     )
 
     @app.get("/")
     @app.get("/health")
     def health():
         return jsonify({"status": "ok"})
+
+    @app.before_request
+    def _require_bearer_auth():
+        if request.method == "OPTIONS":
+            return None
+        if request.path in ("/", "/health"):
+            return None
+        expected_token = app.config.get("API_KEY")
+        if is_authorized_bearer(request.headers.get("Authorization"), expected_token):
+            return None
+        return unauthorized_bearer_response()
 
     @app.after_request
     def _cors(resp):
